@@ -1,0 +1,3 @@
+[submodule "mjpeg-motion-detector"]
+	path = mjpeg-motion-detector
+	url = https://github.com/Pi-Eye/mjpeg-motion-detector
