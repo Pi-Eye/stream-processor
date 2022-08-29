@@ -62,7 +62,7 @@ target_link_libraries(${TEST_EXE_NAME} PRIVATE Catch2::Catch2 Catch2::Catch2With
 target_link_libraries(${BENCHMARK_EXE_NAME} PRIVATE Catch2::Catch2 Catch2::Catch2WithMain)
 
 # Copy .cl Kernel Files To Output Directory
-FILE(GLOB KERNEL_CL_FILES "kernels/*")
+FILE(GLOB KERNEL_CL_FILES "mjpeg-motion-detector/kernels/*")
 foreach(CL_FILE ${KERNEL_CL_FILES})
   get_filename_component(FILE_NAME ${CL_FILE} NAME)
   configure_file(${CL_FILE} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${FILE_NAME})
