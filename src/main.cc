@@ -3,13 +3,13 @@
 #include "camera.hpp"
 #include "jpeg_compressor.hpp"
 #include "motion_detector.hpp"
+#include "parse_arg.hpp"
 #include "text_overlay.hpp"
 
-// Argument list: -w [width] -h [height] -f [format: <RGB> <G>]
-//                -n [camera name] -p [text position: <TL> <TR> <BL> <BR>] -d [show date: <y> <n>]
-//                -g [gaussian size] -s [scale denominator]
-//                -b [background stabilization length] -m [movement stabilization length]
-//                -p [minimum pixel difference] -c [minimum changed pixels]
+// Argument list: --width [width] --height [height] --format [format: <RGB> <G>] --decomp [<fast> <accurate>] --comp [<fast> <accurate>]
+//                --camname [camera name] --position [text position: <TL> <TR> <BL> <BR>] --showdate [show date: <y> <n>] --fontsize [font size (px)] --font [font file]
+//                --gaussian [gaussian size] --scale [scale denominator] --bgstabil [background stabilization length] --mvtstabil [movement stabilization length]
+//                --pixthresh [minimum pixel difference] --framethresh [minimum changed pixels in a frame]
 int main(int argc, char** argv) {
   try {
     std::cout << "Hello, World" << std::endl;

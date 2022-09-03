@@ -8,8 +8,8 @@ project("Raspi_Camera")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
 
 # Set C/C++ Version
-set(CMAKE_C_STANDARD 17)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_C_STANDARD 20)
+set(CMAKE_CXX_STANDARD 20)
 
 # Set Executable Name
 set(EXE_NAME "exec")
@@ -64,6 +64,13 @@ target_link_libraries(${BENCHMARK_EXE_NAME} PRIVATE Catch2::Catch2 Catch2::Catch
 # Copy .cl Kernel Files To Output Directory
 FILE(GLOB KERNEL_CL_FILES "mjpeg-motion-detector/kernels/*")
 foreach(CL_FILE ${KERNEL_CL_FILES})
+  get_filename_component(FILE_NAME ${CL_FILE} NAME)
+  configure_file(${CL_FILE} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${FILE_NAME})
+endforeach()
+
+# Copy Asset Files To Output Directory
+FILE(GLOB ASSET_FILES "assets/*")
+foreach(CL_FILE ${ASSET_FILES})
   get_filename_component(FILE_NAME ${CL_FILE} NAME)
   configure_file(${CL_FILE} ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${FILE_NAME})
 endforeach()

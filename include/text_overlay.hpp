@@ -16,9 +16,11 @@ enum class TextPosition { kTopLeft, kTopRight, kBottomLeft, kBottomRight };
  * text_position: Position to place text on frame
  */
 struct FontSettings {
+  std::string cam_name;
+  TextPosition text_position;
+  bool show_date;
   unsigned int font_size;
   std::string font_filename;
-  TextPosition text_position;
 };
 
 /**
@@ -42,7 +44,7 @@ class TextOverlay {
   void OverlayOnFrame(unsigned char* frame, const std::string& text) const;
 
  private:
-  FontSettings font;             // Font settings
+  FontSettings font_settings;    // Font settings
   InputVideoSettings input_vid;  // Format of the frames to overlay text onto
 };
 
