@@ -39,9 +39,9 @@ class TextOverlay {
    * OverlayOnFrame() - Overlays text over the given frame
    *
    * frame:     Frame to overlay text onto
-   * text:      Text to overlay
+   * timestamp: Timestamp of time to overlay
    */
-  void OverlayOnFrame(unsigned char* frame, const std::string& text) const;
+  void OverlayOnFrame(unsigned char* frame, long long timestamp) const;
 
  private:
   FontSettings font_settings;    // Font settings
