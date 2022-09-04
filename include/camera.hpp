@@ -30,8 +30,8 @@ struct CameraSettings {
   int exposure_comp;
   bool horizontal_flip;
   bool vertical_flip;
-  RASPICAM_AWB awb;
-  RASPICAM_EXPOSURE exposure_mode;
+  raspicam::RASPICAM_AWB awb;
+  raspicam::RASPICAM_EXPOSURE exposure_mode;
 };
 
 /**
@@ -54,6 +54,7 @@ class Camera {
    * Camera() - Constructor for Camera class
    *
    * video_settings:   InputVideoSettings of frames to take
+   * camera_settings:  CameraSettings for camera
    */
   Camera(InputVideoSettings video_settings, CameraSettings cam_settings);
 
@@ -63,6 +64,18 @@ class Camera {
    * returns:   Frame - info for the frame taken
    */
   Frame GetFrame();
+
+ private:
+  /**
+   * ValidateSettings() - Validates camera and input video settings
+   *
+   * video_settings:     InputVideoSettings to validate
+   * camera_settings:    CameraSettings to validate
+   */
+  void ValidateSettings(InputVideoSettings video_settings, CameraSettings cam_settings) const;
+
+  raspicam::RASPICAM_FORMAT format_;    // Format of camera output
+  raspicam::RaspiCam camera_;           // Raspi Camera object
 };
 
 #endif
