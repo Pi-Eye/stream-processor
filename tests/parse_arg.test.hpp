@@ -49,12 +49,23 @@ TEST_CASE("Parse Arguments") {
 
   SECTION("With Valid Arguments") {
     std::string string =
-        "/path/to/some/exec --width 1920 --height 1080 --format RGB --decomp fast --camname camera --position BR --showdate f --fontsize 19 --font "
-        "/path/to/font --gaussian 4 --scale 23 --bgstabil 123 --mvtstabil 12 --pixthresh 24 --framethresh 0.9";
+        "/path/to/some/exec --width 1920 --height 1080 --format RGB --decomp fast --fps 30 --sharpness 10 --contrast 10 --saturation 10 --iso 400 --excomp 1 --hflip y "
+        "--vflip y --awb sunlight --exposure night --camname camera --position BR --showdate n --fontsize 19 --font /path/to/font --gaussian 4 --scale 23 --bgstabil 123 "
+        "--mvtstabil 12 --pixthresh 24 --framethresh 0.9";
     std::pair<int, char**> args = StringToArgv(string);
 
     REQUIRE_NOTHROW(ParseArgs(args.first, args.second));
     Settings settings = ParseArgs(args.first, args.second);
+
+    REQUIRE(settings.cam_settings.fps == 30);
+    REQUIRE(settings.cam_settings.sharpness == 30);
+    REQUIRE(settings.cam_settings.contrast == 30);
+    REQUIRE(settings.cam_settings.saturation == 30);
+    REQUIRE(settings.cam_settings.exposure_comp == 30);
+    REQUIRE(settings.cam_settings.horizontal_flip == 30);
+    REQUIRE(settings.cam_settings.vertical_flip == 30);
+    REQUIRE(settings.cam_settings.awb == raspicam::RASPICAM_AWB::RASPICAM_AWB_SUNLIGHT);
+    REQUIRE(settings.cam_settings.exposure_mode == raspicam::RASPICAM_EXPOSURE::RASPICAM_EXPOSURE_NIGHT);
 
     REQUIRE(settings.vid_settings.width == 1920);
     REQUIRE(settings.vid_settings.height == 1080);

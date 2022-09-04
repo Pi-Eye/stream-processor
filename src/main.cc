@@ -8,7 +8,8 @@
 // Argument list:
 // --width [width] --height [height] --format [format: <RGB> <G>] --decomp [<fast> <accurate>] --fps [fps] --brightness [0, 100] --sharpness [-100, 100] 
 // --contrast [-100, 100] --saturation [-100, 100] --iso [100, 800] --excomp [-10, 10] --hflip [flip horizontally <y> <n>] --vflip [flip vertically <y> <n>] 
-// --awb [<off> <auto> <night> <nightpreview> <backlight> <spotlight> <sports> <snow> <beach> <verylong> <fixedfps> <antishake> <fireworks>]
+// --awb [<off> <auto> <sunlight> <cloudy> <shade> <tungsten> <fluorescent> <incandescent> <flash> <horizon>]
+// --exposure [<off> <auto> <night> <nightpreview> <backlight> <spotlight> <sports> <snow> <beach> <verylong> <fixedfps> <antishake> <fireworks>]
 // --camname [camera name] --position [text position: <TL> <TR> <BL> <BR>] --showdate [show date: <y> <n>] --fontsize [font size (px)] --font [font file]
 // --gaussian [gaussian size] --scale [scale denominator] --bgstabil [background stabilization length] --mvtstabil [movement stabilization length]
 // --pixthresh [minimum pixel difference] --framethresh [minimum changed pixels in a frame]

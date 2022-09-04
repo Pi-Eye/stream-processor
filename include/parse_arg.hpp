@@ -1,6 +1,7 @@
 #ifndef PARSE_ARG_HPP
 #define PARSE_ARG_HPP
 
+#include "camera.hpp"
 #include "motion_detector.hpp"
 #include "text_overlay.hpp"
 
@@ -8,6 +9,7 @@
  * Settings - Struct containing all the settings for camera
  */
 struct Settings {
+  CameraSettings cam_settings;
   InputVideoSettings vid_settings;
   MotionConfig motion_config;
   FontSettings font_settings;
