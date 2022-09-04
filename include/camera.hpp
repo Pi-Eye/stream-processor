@@ -1,11 +1,13 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
+#include <raspicam/raspicam.h>
+
 #include "motion_detector.hpp"
 
 /**
  * CameraSettings - Settings for camera
- * 
+ *
  * fps:                 fps
  * brightness:          brightness [0, 100]
  * sharpness:           sharpness [-100, 100]
@@ -16,7 +18,8 @@
  * horizontal_flip:     flip frame horizontally or not
  * vertical_flip:       flip frame vertically or not
  * awb:                 type of white balance to use
-*/
+ * exposure_mode:       type of exposure mode to use
+ */
 struct CameraSettings {
   unsigned int fps;
   unsigned int brightness;
@@ -27,7 +30,8 @@ struct CameraSettings {
   int exposure_comp;
   bool horizontal_flip;
   bool vertical_flip;
-  //RASPICAM_AWB awb;
+  RASPICAM_AWB awb;
+  RASPICAM_EXPOSURE exposure_mode;
 };
 
 /**
