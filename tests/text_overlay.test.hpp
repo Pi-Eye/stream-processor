@@ -1,6 +1,7 @@
 // NOLINTBEGIN(misc-definitions-in-headers)
 #include <catch2/catch_all.hpp>
 #include <fstream>
+#include <iostream>
 
 #include "text_overlay.hpp"
 #define ALLOWABLE_ERROR 1
@@ -78,50 +79,39 @@ bool CompareRGB(PpmFile ppm, const unsigned char* compare) {
 }
 
 TEST_CASE("Text Overlay") {
-  SECTION("Bottom Left") {
-    PpmFile expected = ReadPpm("../test-images/bottom-left-font.ppm");
+  SECTION("Top") {
+    PpmFile expected = ReadPpm("../test-images/top-cst.ppm");
     unsigned char* blank = new unsigned char[expected.width * expected.height * 3];
-    for (int i = 0; i < expected.width * expected.height; i++) blank[i] = 255;
+    for (int i = 0; i < expected.width * expected.height * 3; i++) blank[i] = static_cast<unsigned char>(255);
 
     InputVideoSettings vid_settings = {200, 16, DecompFrameFormat::kRGB};
-    FontSettings settings = {"Test", TextPosition::kBottomLeft, true, 9, "Pixeloid_by_GGBotNet.ttf"};
-    TextOverlay text_overlay = TextOverlay(vid_settings, settings);
-
-    text_overlay.OverlayOnFrame(blank, 0);
-    REQUIRE(CompareRGB(expected, blank));
-  }
-  SECTION("Bottom Right") {
-    PpmFile expected = ReadPpm("../test-images/bottom-right-font.ppm");
-    unsigned char* blank = new unsigned char[expected.width * expected.height * 3];
-    for (int i = 0; i < expected.width * expected.height; i++) blank[i] = 255;
-
-    InputVideoSettings vid_settings = {200, 16, DecompFrameFormat::kRGB};
-    FontSettings settings = {"Test", TextPosition::kBottomRight, true, 9, "Pixeloid_by_GGBotNet.ttf"};
-    TextOverlay text_overlay = TextOverlay(vid_settings, settings);
-
-    text_overlay.OverlayOnFrame(blank, 0);
-    REQUIRE(CompareRGB(expected, blank));
-  }
-  SECTION("Top Left") {
-    PpmFile expected = ReadPpm("../test-images/top-left-font.ppm");
-    unsigned char* blank = new unsigned char[expected.width * expected.height * 3];
-    for (int i = 0; i < expected.width * expected.height; i++) blank[i] = 255;
-
-    InputVideoSettings vid_settings = {200, 16, DecompFrameFormat::kRGB};
-    FontSettings settings = {"Test", TextPosition::kTopLeft, true, 9, "Pixeloid_by_GGBotNet.ttf"};
+    FontSettings settings = {"Test", TextPosition::kTop, true, 9, "../assets/Pixeloid_by_GGBotNet.ttf"};
     TextOverlay text_overlay = TextOverlay(vid_settings, settings);
 
     text_overlay.OverlayOnFrame(blank, 0);
     REQUIRE(CompareRGB(expected, blank));
   }
 
-  SECTION("Top Right") {
-    PpmFile expected = ReadPpm("../test-images/top-right-font.ppm");
+  SECTION("Bottom") {
+    PpmFile expected = ReadPpm("../test-images/bottom-cst.ppm");
     unsigned char* blank = new unsigned char[expected.width * expected.height * 3];
-    for (int i = 0; i < expected.width * expected.height; i++) blank[i] = 255;
+    for (int i = 0; i < expected.width * expected.height * 3; i++) blank[i] = static_cast<unsigned char>(255);
 
     InputVideoSettings vid_settings = {200, 16, DecompFrameFormat::kRGB};
-    FontSettings settings = {"Test", TextPosition::kTopRight, true, 9, "Pixeloid_by_GGBotNet.ttf"};
+    FontSettings settings = {"Test", TextPosition::kBottom, true, 9, "../assets/Pixeloid_by_GGBotNet.ttf"};
+    TextOverlay text_overlay = TextOverlay(vid_settings, settings);
+
+    text_overlay.OverlayOnFrame(blank, 0);
+    REQUIRE(CompareRGB(expected, blank));
+  }
+
+  SECTION("Overflow") {
+    PpmFile expected = ReadPpm("../test-images/bottom-overflow-cst.ppm");
+    unsigned char* blank = new unsigned char[expected.width * expected.height * 3];
+    for (int i = 0; i < expected.width * expected.height * 3; i++) blank[i] = static_cast<unsigned char>(255);
+
+    InputVideoSettings vid_settings = {200, 16, DecompFrameFormat::kRGB};
+    FontSettings settings = {"A REALLY LONG NAME", TextPosition::kBottom, true, 9, "../assets/Pixeloid_by_GGBotNet.ttf"};
     TextOverlay text_overlay = TextOverlay(vid_settings, settings);
 
     text_overlay.OverlayOnFrame(blank, 0);

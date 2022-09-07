@@ -26,7 +26,7 @@ Settings ParseArgs(int argc, char** argv) {
                                                   {"--awb", "0"},
                                                   {"--exposure", "0"},
                                                   {"--camname", "Camera"},
-                                                  {"--position", "BL"},
+                                                  {"--position", "B"},
                                                   {"--showdate", "y"},
                                                   {"--fontsize", "8"},
                                                   {"--font", "Pixeloid_by_GGBotNet.ttf"},
@@ -106,9 +106,7 @@ Settings ParseArgs(int argc, char** argv) {
   MotionConfig motion_config = {gaussian, scale, bg_stabil, mvt_stabil, min_pix_diff, min_changed_pix, decomp_method};
 
   // Font Settings
-  std::map<std::string, TextPosition> positions = {
-      {"TL", TextPosition::kTopLeft}, {"TR", TextPosition::kTopRight}, {"BL", TextPosition::kBottomLeft}, {"BR", TextPosition::kBottomRight}  //
-  };
+  std::map<std::string, TextPosition> positions = {{"T", TextPosition::kTop}, {"B", TextPosition::kBottom}};
   std::string cam_name = arguments.at("--camname");
   TextPosition position = positions.at(arguments.at("--position"));
   bool show_date = true_false.at(arguments.at("--showdate"));

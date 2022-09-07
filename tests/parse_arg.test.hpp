@@ -50,7 +50,7 @@ TEST_CASE("Parse Arguments") {
   SECTION("With Valid Arguments") {
     std::string string =
         "/path/to/some/exec --width 1920 --height 1080 --format RGB --decomp fast --fps 30 --sharpness 10 --contrast 10 --saturation 10 --iso 400 --excomp 1 --hflip y "
-        "--vflip y --awb sunlight --exposure night --camname camera --position BR --showdate n --fontsize 19 --font /path/to/font --gaussian 4 --scale 23 --bgstabil 123 "
+        "--vflip y --awb sunlight --exposure night --camname camera --position T --showdate n --fontsize 19 --font /path/to/font --gaussian 4 --scale 23 --bgstabil 123 "
         "--mvtstabil 12 --pixthresh 24 --framethresh 0.9";
     std::pair<int, char**> args = StringToArgv(string);
 
@@ -82,7 +82,7 @@ TEST_CASE("Parse Arguments") {
     REQUIRE(settings.font_settings.font_filename == "/path/to/font");
     REQUIRE(settings.font_settings.font_size == 19);
     REQUIRE(settings.font_settings.show_date == false);
-    REQUIRE(settings.font_settings.text_position == TextPosition::kBottomRight);
+    REQUIRE(settings.font_settings.text_position == TextPosition::kTop);
   }
 }
 

@@ -1,12 +1,16 @@
 #ifndef TEXT_OVERLAY_HPP
 #define TEXT_OVERLAY_HPP
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+#include <string>
+
 #include "motion_detector.hpp"
 
 /**
  * TextPosition - Where to place text on frame
  */
-enum class TextPosition { kTopLeft, kTopRight, kBottomLeft, kBottomRight };
+enum class TextPosition { kTop, kBottom };
 
 /**
  * FontSettings - Settings for the text and font
@@ -31,9 +35,10 @@ class TextOverlay {
   /**
    * TextOverlay() - Constructor for TextOverlay
    *
-   * input_vid:    Settings of the frames to overlay text onto
+   * input_vid:       Settings of the frames to overlay text onto
+   * font_settings:   Settings for the font to overlay
    */
-  TextOverlay(InputVideoSettings input_vid, FontSettings font);
+  TextOverlay(InputVideoSettings input_vid, FontSettings font_settings);
 
   /**
    * OverlayOnFrame() - Overlays text over the given frame
@@ -44,8 +49,22 @@ class TextOverlay {
   void OverlayOnFrame(unsigned char* frame, long long timestamp) const;
 
  private:
-  FontSettings font_settings;    // Font settings
-  InputVideoSettings input_vid;  // Format of the frames to overlay text onto
+  /**
+   * GenerateText() - Generates the text to display on the frame
+   *
+   * timestamp:   Timestamp of frame
+   * returns:     std::string - text to display on frame
+   */
+  std::string GenerateText(long long timestamp) const;
+
+  unsigned int start_x_;  // Where to start drawing text
+  unsigned int start_y_;  // Where to start drawing text
+  unsigned int colors_;   // Number of colors in image
+
+  FT_Face font_face_;           // Font face being used
+  FontSettings font_settings_;  // Font settings
+
+  InputVideoSettings vid_settings_;  // Incoming frame information
 };
 
 #endif
