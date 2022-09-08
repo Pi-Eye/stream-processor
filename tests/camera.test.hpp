@@ -2,6 +2,7 @@
 #include <catch2/catch_all.hpp>
 #include <chrono>
 
+#include <raspicam/raspicam_still.h>
 #include "camera.hpp"
 
 TEST_CASE("Camera Settings") {
@@ -73,12 +74,12 @@ TEST_CASE("Camera Settings") {
     REQUIRE_THROWS(Camera(settings, cam_settings));
 
     // Width
-    cam_settings = {30, 100, 0, 0, 0, 100, 0, false, false, RASPICAM_AWB::RASPICAM_AWB_AUTO, RASPICAM_EXPOSURE::RASPICAM_EXPOSURE_AUTO};
+    cam_settings = {30, 100, 0, 0, 0, 100, 0, false, false, raspicam::RASPICAM_AWB::RASPICAM_AWB_AUTO, raspicam::RASPICAM_EXPOSURE::RASPICAM_EXPOSURE_AUTO};
     settings = {0, 480, DecompFrameFormat::kRGB};
     REQUIRE_THROWS(Camera(settings, cam_settings));
 
     // Height
-    cam_settings = {30, 100, 0, 0, 0, 100, 0, false, false, RASPICAM_AWB::RASPICAM_AWB_AUTO, RASPICAM_EXPOSURE::RASPICAM_EXPOSURE_AUTO};
+    cam_settings = {30, 100, 0, 0, 0, 100, 0, false, false, raspicam::RASPICAM_AWB::RASPICAM_AWB_AUTO, raspicam::RASPICAM_EXPOSURE::RASPICAM_EXPOSURE_AUTO};
     settings = {640, 0, DecompFrameFormat::kRGB};
     REQUIRE_THROWS(Camera(settings, cam_settings));
   }

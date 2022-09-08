@@ -67,6 +67,7 @@ target_link_libraries(${EXE_NAME} PRIVATE freetype)
 target_link_libraries(${TEST_EXE_NAME} PRIVATE freetype)
 target_link_libraries(${BENCHMARK_EXE_NAME} PRIVATE freetype)
 
+target_include_directories(${TEST_EXE_NAME} PRIVATE raspicam-0.1.9/)
 
 # Find Catch2
 find_package(Catch2 CONFIG REQUIRED)

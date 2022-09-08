@@ -1,20 +1,21 @@
 #include "camera.hpp"
 
-#include <unistd.h>
+#include <raspicam/raspicam_still.h>
 #include <chrono>
 #include <stdexcept>
 
 #include "motion_detector.hpp"
+
 Camera::Camera(InputVideoSettings video_settings, CameraSettings cam_settings) {
+  // Check settings
   ValidateSettings(video_settings, cam_settings);
 
+  // Start camera
+  camera_ = raspicam::RaspiCam_Still();
+
   // Set camera settings
-  std::map<DecompFrameFormat, raspicam::RASPICAM_FORMAT> formats = {{DecompFrameFormat::kGray, raspicam::RASPICAM_FORMAT::RASPICAM_FORMAT_GRAY},
-                                                                    {DecompFrameFormat::kRGB, raspicam::RASPICAM_FORMAT::RASPICAM_FORMAT_RGB}};
-  format_ = formats.at(vid_settings.frame_format);
   camera_.setFormat(format_);
   camera_.setCaptureSize(vid_settings_.width, vid_settings_.height);
-  camera_.setFrameRate(cam_settings.fps);
   camera_.setBrightness(cam_settings.brightness);
   camera_.setSharpness(cam_settings.sharpness);
   camera_.setContrast(cam_settings.contrast);
@@ -25,14 +26,15 @@ Camera::Camera(InputVideoSettings video_settings, CameraSettings cam_settings) {
   camera_.setHorizontalFlip(cam_settings.horizontal_flip);
   camera_.setVerticalFlip(cam_settings.vertical_flip);
 
+  camera_.setEncoding(raspicam::RASPICAM_ENCODING::RASPICAM_ENCODING_JPEG);  // Take images in jpeg format
+
   if (!camera_.open()) throw std::runtime_error("Failed to open camera");
   usleep(3000000);  // NOLINT(readability-magic-numbers)
 }
 
 Frame Camera::GetFrame() {
-  unsigned char* data = new unsigned char[camera_.getImageBufferSize()];
-  Camera.grab();
-  Camera.retrieve(data, format_);
+  size_t size = camera_.getImageBufferSize() unsigned char* data = new unsigned char[size];
+  Camera.grab_retrieve(data, size);
   long long timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now()).const();
   return {data, timestamp};
 }

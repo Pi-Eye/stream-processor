@@ -58,12 +58,12 @@ TEST_CASE("Parse Arguments") {
     Settings settings = ParseArgs(args.first, args.second);
 
     REQUIRE(settings.cam_settings.fps == 30);
-    REQUIRE(settings.cam_settings.sharpness == 30);
-    REQUIRE(settings.cam_settings.contrast == 30);
-    REQUIRE(settings.cam_settings.saturation == 30);
-    REQUIRE(settings.cam_settings.exposure_comp == 30);
-    REQUIRE(settings.cam_settings.horizontal_flip == 30);
-    REQUIRE(settings.cam_settings.vertical_flip == 30);
+    REQUIRE(settings.cam_settings.sharpness == 10);
+    REQUIRE(settings.cam_settings.contrast == 10);
+    REQUIRE(settings.cam_settings.saturation == 10);
+    REQUIRE(settings.cam_settings.exposure_comp == 1);
+    REQUIRE(settings.cam_settings.horizontal_flip == true);
+    REQUIRE(settings.cam_settings.vertical_flip == true);
     REQUIRE(settings.cam_settings.awb == raspicam::RASPICAM_AWB::RASPICAM_AWB_SUNLIGHT);
     REQUIRE(settings.cam_settings.exposure_mode == raspicam::RASPICAM_EXPOSURE::RASPICAM_EXPOSURE_NIGHT);
 
