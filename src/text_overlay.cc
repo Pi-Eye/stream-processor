@@ -3,7 +3,9 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include <chrono>
+#include <iomanip>
 #include <stdexcept>
+#include <iostream>
 
 #include "motion_detector.hpp"
 
@@ -88,11 +90,11 @@ void TextOverlay::OverlayOnFrame(unsigned char* frame, long long timestamp) cons
 }
 
 std::string TextOverlay::GenerateText(long long timestamp) const {
-  std::chrono::seconds duration = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::duration<long long, std::ratio<1, 1>>(timestamp));
-  std::chrono::time_point<std::chrono::system_clock, std::chrono::seconds> time_point_sec(duration);
-  std::chrono::zoned_seconds time = std::chrono::zoned_seconds(std::chrono::current_zone(), time_point_sec);
+  auto epoch = std::chrono::time_point<std::chrono::system_clock>();
+  auto oldNow = epoch + std::chrono::duration_cast<std::chrono::seconds>(std::chrono::duration<int>(timestamp));
+  auto t_c = std::chrono::system_clock::to_time_t(oldNow);
 
   std::stringstream time_string;
-  time_string << time;
+  time_string << std::put_time(std::localtime(&t_c), "%F %T %Z");
   return font_settings_.cam_name + " " + time_string.str();
 }

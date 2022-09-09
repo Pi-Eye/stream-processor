@@ -17,14 +17,16 @@ set(TEST_EXE_NAME "test")
 set(BENCHMARK_EXE_NAME "benchmark")
 
 # Grab all .cc Files In "src"
-AUX_SOURCE_DIRECTORY("src" SRC_CC_FILES) 
+AUX_SOURCE_DIRECTORY("src" SRC_CC_FILES)
+AUX_SOURCE_DIRECTORY("mjpeg-motion-detector/src" MOTION_CC_FILES)
 
 # Create Executables
-add_executable(${EXE_NAME} "src/main.cc" ${SRC_CC_FILES})
+add_executable(${EXE_NAME} "src/main.cc" ${SRC_CC_FILES} ${MOTION_CC_FILES})
 # Remove main.cc and open_cl_interface.cc from SRC_CC_Files for use in tests
-list(REMOVE_ITEM SRC_CC_FILES "src/main.cc")
-add_executable(${TEST_EXE_NAME} "tests/tests.cc" "tests/text_overlay.test.hpp" "src/text_overlay.cc")#${SRC_CC_FILES})
-add_executable(${BENCHMARK_EXE_NAME} "tests/benchmarks.cc" ${SRC_CC_FILES})
+list(REMOVE_ITEM SRC_CC_FILES "src/main.cc" "src/camera.cc")
+list(REMOVE_ITEM MOTION_CC_FILES "mjpeg-motion-detector/src/main.cc")
+add_executable(${TEST_EXE_NAME} "tests/tests.cc" ${SRC_CC_FILES} ${MOTION_CC_FILES})
+add_executable(${BENCHMARK_EXE_NAME} "tests/benchmarks.cc" ${SRC_CC_FILES} ${MOTION_CC_FILES})
 
 # Local Includes
 set(LOCAL_INCLUDES "include")
@@ -66,8 +68,6 @@ find_package(freetype CONFIG REQUIRED)
 target_link_libraries(${EXE_NAME} PRIVATE freetype)
 target_link_libraries(${TEST_EXE_NAME} PRIVATE freetype)
 target_link_libraries(${BENCHMARK_EXE_NAME} PRIVATE freetype)
-
-target_include_directories(${TEST_EXE_NAME} PRIVATE raspicam-0.1.9/)
 
 # Find Catch2
 find_package(Catch2 CONFIG REQUIRED)

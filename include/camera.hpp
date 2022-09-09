@@ -1,7 +1,7 @@
 #ifndef CAMERA_HPP
 #define CAMERA_HPP
 
-#include <raspicam/raspicam_still.h>
+#include <raspicam/raspicam.h>
 
 #include "motion_detector.hpp"
 
@@ -74,7 +74,8 @@ class Camera {
    */
   void ValidateSettings(InputVideoSettings video_settings, CameraSettings cam_settings) const;
 
-  raspicam::RaspiCam_Still camera_;   // Raspi Camera object
+  raspicam::RASPICAM_FORMAT format_;  // Buffer format for raspicam images
+  raspicam::Raspicam camera_;         // Raspi Camera object
 };
 
 #endif

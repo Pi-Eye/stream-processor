@@ -1,7 +1,10 @@
 #include "camera.hpp"
 
-#include <raspicam/raspicam_still.h>
+#include <raspicam/raspicam.h>
+#include <unistd.h>
+
 #include <chrono>
+#include <map>
 #include <stdexcept>
 
 #include "motion_detector.hpp"
@@ -11,9 +14,14 @@ Camera::Camera(InputVideoSettings video_settings, CameraSettings cam_settings) {
   ValidateSettings(video_settings, cam_settings);
 
   // Start camera
-  camera_ = raspicam::RaspiCam_Still();
+  camera_ = raspicam::Raspicam();
 
   // Set camera settings
+  std::map<DecompFrameFormat, raspicam::RASPICAM_FORMAT> formats = {
+      {DecompFrameFormat::kGray, raspicam::RASPICAM_FORMAT::RASPICAM_FORMAT_GRAY},
+      {DecompFrameFormat::kRGB, raspicam::RASPICAM_FORMAT::RASPICAM_FORMAT_RGB},
+  };
+  format_ = formats.at(video_settings.frame_format);
   camera_.setFormat(format_);
   camera_.setCaptureSize(vid_settings_.width, vid_settings_.height);
   camera_.setBrightness(cam_settings.brightness);
@@ -26,23 +34,23 @@ Camera::Camera(InputVideoSettings video_settings, CameraSettings cam_settings) {
   camera_.setHorizontalFlip(cam_settings.horizontal_flip);
   camera_.setVerticalFlip(cam_settings.vertical_flip);
 
-  camera_.setEncoding(raspicam::RASPICAM_ENCODING::RASPICAM_ENCODING_JPEG);  // Take images in jpeg format
-
   if (!camera_.open()) throw std::runtime_error("Failed to open camera");
   usleep(3000000);  // NOLINT(readability-magic-numbers)
 }
 
 Frame Camera::GetFrame() {
-  size_t size = camera_.getImageBufferSize() unsigned char* data = new unsigned char[size];
-  Camera.grab_retrieve(data, size);
-  long long timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now()).const();
+  size_t size = camera_.getImageBufferSize();
+  unsigned char* data = new unsigned char[size];
+  camera_.grab();
+  camera_.retrieve(data, format_);
+  long long timestamp = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now()).count();
   return {data, timestamp};
 }
 
 void Camera::ValidateSettings(InputVideoSettings video_settings, CameraSettings cam_settings) const {
   // NOLINTBEGIN(readability-magic-numbers)
-  if (vid_settings.width == 0) throw std::invalid_argument("Width cannot be 0");
-  if (vid_settings.height == 0) throw std::invalid_argument("Height cannot be 0");
+  if (video_settings.width == 0) throw std::invalid_argument("Width cannot be 0");
+  if (video_settings.height == 0) throw std::invalid_argument("Height cannot be 0");
 
   if (cam_settings.fps == 0) throw std::invalid_argument("FPS cannot be 0");
 

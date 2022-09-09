@@ -2,7 +2,6 @@
 #include <catch2/catch_all.hpp>
 #include <chrono>
 
-#include <raspicam/raspicam_still.h>
 #include "camera.hpp"
 
 TEST_CASE("Camera Settings") {
