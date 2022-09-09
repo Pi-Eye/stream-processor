@@ -1,71 +1,76 @@
+// NOLINTBEGIN(readability-magic-numbers)
 #include <catch2/catch_all.hpp>
 
-#include "camera.hpp"
-#include "jpeg_compressor.hpp"
+#include "stream_processor.hpp"
 #include "utils.test.hpp"
 
-void TakeImages(Camera& camera) {
-  Frame frame = camera.GetFrame();
-  delete[] frame.data;
+const int kDevice = 0;  // OpenCL device to run tests on
+
+std::ostream* empty_output = new std::ostream(0);
+
+struct Configs {
+  MotionConfig motion;
+  std::pair<unsigned int, unsigned int> resolution;
+};
+
+// NOLINTBEGIN(readability-*)
+std::vector<std::pair<unsigned int, unsigned int>> resolutions = {{320, 240}, {640, 480}, {1280, 720}, {1920, 1080}};
+std::vector<unsigned int> gaussian_sizes = {1, 2};
+std::vector<unsigned int> scale_denominators = {10, 5};
+
+std::vector<Configs> PermutateConfigs() {
+  std::vector<Configs> configs;
+  for (int a = 0; a < resolutions.size(); a++) {
+    for (int b = 0; b < gaussian_sizes.size(); b++) {
+      for (int c = 0; c < scale_denominators.size(); c++) {
+        MotionConfig motion = {gaussian_sizes.at(b), scale_denominators.at(c), 10, 2, 10, 0.1, DecompFrameMethod::kFast};
+        configs.push_back({motion, resolutions.at(a)});
+      }
+    }
+  }
+  return configs;
+}
+// NOLINTEND(readability-*)
+
+void ProcessFrame(StreamProcessor& processor, JpegFile& jpeg_file) {
+  Processed processed = processor.ProcessFrame(jpeg_file.data, jpeg_file.filesize, 0);
+  delete[] processed.compressed.frame;
 }
 
-void CompressImages(JpegCompressor& compressor, unsigned char* image) {
-  Compressed compressed = compressor.CompressImage(image);
-  delete[] compressed.frame;
+TEST_CASE("Benchmark Stream Processor") {
+  std::vector<Configs> configs = PermutateConfigs();
+  DeviceConfig device_config = {DeviceType::kSpecific, kDevice};
+  FontSettings font_settings = {"Test", TextPosition::kTop, true, 9, "../assets/Pixeloid_by_GGBotNet.ttf"};
+  for (int i = 0; i < configs.size(); i++) {
+    std::string name;
+    {  // Create name of benchmark
+      name.append(std::to_string(configs.at(i).resolution.first));
+      name.append("x");
+      name.append(std::to_string(configs.at(i).resolution.second));
+      name.append("\n");
+
+      name.append("Gaussian Size: ");
+      name.append(std::to_string(configs.at(i).motion.gaussian_size));
+      name.append("   Scale: ");
+      name.append(std::to_string(configs.at(i).motion.scale_denominator));
+      name.append("\n");
+    }
+
+    // Get relavent test image
+    // NOLINTBEGIN(readability-magic-numbers)
+    std::string jpg_name;
+    if (configs.at(i).resolution.first == 320) jpg_name = "../test-images/320x240-test-image.jpg";
+    if (configs.at(i).resolution.first == 640) jpg_name = "../test-images/640x480-test-image.jpg";
+    if (configs.at(i).resolution.first == 1280) jpg_name = "../test-images/1280x720-test-image.jpg";
+    if (configs.at(i).resolution.first == 1920) jpg_name = "../test-images/1920x1080-test-image.jpg";
+
+    JpegFile jpeg_frame = ReadJpeg(jpg_name);
+    // NOLINTEND(readability-magic-numbers)
+
+    StreamProcessor processor = StreamProcessor(empty_output, configs.at(i).resolution.first, configs.at(i).resolution.second, CompFrameFormat::kRGB, 75, font_settings,
+                                                configs.at(i).motion, device_config);
+
+    BENCHMARK(std::string(name)) { return ProcessFrame(processor, jpeg_frame); };
+  }
 }
-
-TEST_CASE("Benchmark JPEG Compressor") {
-  // NOLINTBEGIN (readability-magic-numbers)
-  {
-    PpmFile file = ReadPpm("../test-images/640x480-test-image.ppm");
-    unsigned char* image = new unsigned char[static_cast<unsigned int>(file.width * file.height * 3)];
-    for (int i = 0; i < file.width * file.height * 3; i++) image[i] = file.data.at(i);
-
-    JpegCompressor compressor = JpegCompressor(640, 480, 75, CompFrameFormat::kRGB, CompFrameMethod::kFast);
-    BENCHMARK("640x480") { return CompressImages(compressor, image); };
-  }
-
-  {
-    PpmFile file = ReadPpm("../test-images/1280x720-test-image.ppm");
-    unsigned char* image = new unsigned char[static_cast<unsigned int>(file.width * file.height * 3)];
-    for (int i = 0; i < file.width * file.height * 3; i++) image[i] = file.data.at(i);
-
-    JpegCompressor compressor = JpegCompressor(1280, 720, 75, CompFrameFormat::kRGB, CompFrameMethod::kFast);
-    BENCHMARK("1280x720") { return CompressImages(compressor, image); };
-  }
-
-  {
-    PpmFile file = ReadPpm("../test-images/1920x1080-test-image.ppm");
-    unsigned char* image = new unsigned char[static_cast<unsigned int>(file.width * file.height * 3)];
-    for (int i = 0; i < file.width * file.height * 3; i++) image[i] = file.data.at(i);
-
-    JpegCompressor compressor = JpegCompressor(1920, 1080, 75, CompFrameFormat::kRGB, CompFrameMethod::kFast);
-    BENCHMARK("1920x1080") { return CompressImages(compressor, image); };
-  }
-  // NOLINTEND (readability-magic-numbers)
-}
-
-TEST_CASE("Benchmark Raspi Camera") {
-  // NOLINTBEGIN (readability-magic-numbers)
-  {
-    InputVideoSettings vid_settings = {640, 480, DecompFrameFormat::kRGB};
-    CameraSettings cam_settings = {60, 100, 0, 0, 0, 100, 0, false, false, raspicam::RASPICAM_AWB::RASPICAM_AWB_AUTO, raspicam::RASPICAM_EXPOSURE::RASPICAM_EXPOSURE_AUTO};
-    Camera camera = Camera(vid_settings, cam_settings);
-    BENCHMARK("640x480") { return TakeImages(camera); };
-  }
-
-  {
-    InputVideoSettings vid_settings = {1280, 720, DecompFrameFormat::kRGB};
-    CameraSettings cam_settings = {60, 100, 0, 0, 0, 100, 0, false, false, raspicam::RASPICAM_AWB::RASPICAM_AWB_AUTO, raspicam::RASPICAM_EXPOSURE::RASPICAM_EXPOSURE_AUTO};
-    Camera camera = Camera(vid_settings, cam_settings);
-    BENCHMARK("1280x720") { return TakeImages(camera); };
-  }
-
-  {
-    InputVideoSettings vid_settings = {1920, 1080, DecompFrameFormat::kRGB};
-    CameraSettings cam_settings = {60, 100, 0, 0, 0, 100, 0, false, false, raspicam::RASPICAM_AWB::RASPICAM_AWB_AUTO, raspicam::RASPICAM_EXPOSURE::RASPICAM_EXPOSURE_AUTO};
-    Camera camera = Camera(vid_settings, cam_settings);
-    BENCHMARK("1920x1080") { return TakeImages(camera); };
-  }
-  // NOLINTEND (readability-magic-numbers)
-}
+// NOLINTEND(readability-magic-numbers)

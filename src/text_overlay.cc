@@ -91,8 +91,8 @@ void TextOverlay::OverlayOnFrame(unsigned char* frame, long long timestamp) cons
 
 std::string TextOverlay::GenerateText(long long timestamp) const {
   auto epoch = std::chrono::time_point<std::chrono::system_clock>();
-  auto oldNow = epoch + std::chrono::duration_cast<std::chrono::seconds>(std::chrono::duration<int>(timestamp));
-  auto t_c = std::chrono::system_clock::to_time_t(oldNow);
+  auto old_now = epoch + std::chrono::duration_cast<std::chrono::seconds>(std::chrono::duration<int>(timestamp));
+  auto t_c = std::chrono::system_clock::to_time_t(old_now);
 
   std::stringstream time_string;
   time_string << std::put_time(std::localtime(&t_c), "%F %T %Z");

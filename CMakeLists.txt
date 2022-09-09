@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION "3.24")
 
 # Name Project
-project("Raspi_Camera")
+project("Stream_Processor")
 
 # Set output directory to bin
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin)
@@ -21,10 +21,10 @@ AUX_SOURCE_DIRECTORY("src" SRC_CC_FILES)
 AUX_SOURCE_DIRECTORY("mjpeg-motion-detector/src" MOTION_CC_FILES)
 
 # Create Executables
+list(REMOVE_ITEM MOTION_CC_FILES "mjpeg-motion-detector/src/main.cc")
 add_executable(${EXE_NAME} "src/main.cc" ${SRC_CC_FILES} ${MOTION_CC_FILES})
 # Remove main.cc and open_cl_interface.cc from SRC_CC_Files for use in tests
-list(REMOVE_ITEM SRC_CC_FILES "src/main.cc" "src/camera.cc")
-list(REMOVE_ITEM MOTION_CC_FILES "mjpeg-motion-detector/src/main.cc")
+list(REMOVE_ITEM SRC_CC_FILES "src/main.cc")
 add_executable(${TEST_EXE_NAME} "tests/tests.cc" ${SRC_CC_FILES} ${MOTION_CC_FILES})
 add_executable(${BENCHMARK_EXE_NAME} "tests/benchmarks.cc" ${SRC_CC_FILES} ${MOTION_CC_FILES})
 

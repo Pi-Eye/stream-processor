@@ -7,7 +7,31 @@
 #include <iostream>
 #include <vector>
 
-#define ALLOWABLE_ERROR 1
+#define ALLOWABLE_ERROR 10
+
+struct JpegFile {
+  unsigned long filesize;
+  unsigned char* data;
+};
+
+JpegFile ReadJpeg(const std::string& path) {
+  // Create filestream and throw error if it fails
+  std::ifstream ifs(path, std::ios::binary);
+  if (!ifs.good()) throw std::runtime_error("Error reading file: " + path);
+
+  // Get filesize
+  ifs.seekg(0, std::ios::end);
+  unsigned int filesize = ifs.tellg();
+  ifs.seekg(0);
+
+  // Create destination for file
+  unsigned char* data = new unsigned char[filesize];
+
+  // Read file
+  ifs.read(reinterpret_cast<char*>(data), filesize);
+
+  return {filesize, data};
+}
 
 struct PpmFile {
   unsigned int width;
@@ -59,6 +83,32 @@ bool CompareRGB(PpmFile ppm, const unsigned char* compare) {
   bool match = true;
   for (unsigned int row = 0; row < ppm.height; row++) {
     for (unsigned int col = 0; col < ppm.width; col++) {
+      unsigned int index = (row * ppm.width + col) * 3;
+      if (abs(static_cast<int>(ppm.data.at(index)) - static_cast<int>(compare[index])) > ALLOWABLE_ERROR) {
+        match = false;
+        std::cout << "Red pixel did not match at row: " << row << " col: " << col << std::endl;
+        std::cout << "Expected: " << ppm.data.at(index) << " but recieved: " << static_cast<int>(compare[index]) << std::endl;
+      }
+      if (abs(static_cast<int>(ppm.data.at(index + 1)) - static_cast<int>(compare[index + 1])) > ALLOWABLE_ERROR) {
+        match = false;
+        std::cout << "Green pixel did not match at row: " << row << " col: " << col << std::endl;
+        std::cout << "Expected: " << ppm.data.at(index + 1) << " but recieved: " << static_cast<int>(compare[index + 1]) << std::endl;
+      }
+      if (abs(static_cast<int>(ppm.data.at(index + 2)) - static_cast<int>(compare[index + 2])) > ALLOWABLE_ERROR) {
+        match = false;
+        std::cout << "Blue pixel did not match at row: " << row << " col: " << col << std::endl;
+        std::cout << "Expected: " << ppm.data.at(index + 2) << " but recieved: " << static_cast<int>(compare[index + 2]) << std::endl;
+      }
+    }
+  }
+  delete[] compare;
+  return match;
+}
+
+bool CompareRGBLimited(PpmFile ppm, const unsigned char* compare, unsigned int width, unsigned int height) {
+  bool match = true;
+  for (unsigned int row = 0; row < height; row++) {
+    for (unsigned int col = 0; col < width; col++) {
       unsigned int index = (row * ppm.width + col) * 3;
       if (abs(static_cast<int>(ppm.data.at(index)) - static_cast<int>(compare[index])) > ALLOWABLE_ERROR) {
         match = false;

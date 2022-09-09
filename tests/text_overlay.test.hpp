@@ -15,7 +15,7 @@ TEST_CASE("Text Overlay") {
     TextOverlay text_overlay = TextOverlay(vid_settings, settings);
 
     text_overlay.OverlayOnFrame(blank, 0);
-    REQUIRE(CompareRGB(expected, blank));
+    REQUIRE(CompareRGBLimited(expected, blank, 125, 16));
   }
 
   SECTION("Bottom") {
@@ -28,7 +28,7 @@ TEST_CASE("Text Overlay") {
     TextOverlay text_overlay = TextOverlay(vid_settings, settings);
 
     text_overlay.OverlayOnFrame(blank, 0);
-    REQUIRE(CompareRGB(expected, blank));
+    REQUIRE(CompareRGBLimited(expected, blank, 125, 16));
   }
 
   SECTION("Overflow") {
