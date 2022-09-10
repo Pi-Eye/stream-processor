@@ -78,7 +78,7 @@ class StreamProcessor {
    * timestamp:           Timestamp of frame
    * returns:   Processed - Processed frame
    */
-  Processed ProcessFrame(unsigned char* compressed_image, unsigned long& jpeg_size, long long timestamp = 0);
+  Processed ProcessFrame(unsigned char* compressed_image, unsigned long jpeg_size, long long timestamp = 0);
 
  private:
   bool text_;                    // Overlay text or not

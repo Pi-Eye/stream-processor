@@ -39,7 +39,7 @@ StreamProcessor::~StreamProcessor() {
   delete jpeg_decompressor_;
 }
 
-Processed StreamProcessor::ProcessFrame(unsigned char* compressed_image, unsigned long& jpeg_size, long long timestamp) {
+Processed StreamProcessor::ProcessFrame(unsigned char* compressed_image, unsigned long jpeg_size, long long timestamp) {
   // Decompress image
   unsigned char* decompressed = jpeg_decompressor_->DecompressImage(compressed_image, jpeg_size);
 
