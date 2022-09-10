@@ -131,5 +131,19 @@ bool CompareRGBLimited(PpmFile ppm, const unsigned char* compare, unsigned int w
   return match;
 }
 
+bool CompareJpegRGB(JpegFile jpeg0, JpegFile jpeg1, unsigned int width, unsigned int height) {
+  JpegDecompressor decompressor = JpegDecompressor(640, 480, DecompFrameFormat::kRGB, DecompFrameMethod::kAccurate);
+  unsigned char* decompressed0 = decompressor.DecompressImage(jpeg0.data, jpeg0.filesize);
+  unsigned char* decompressed1 = decompressor.DecompressImage(jpeg1.data, jpeg1.filesize);
+
+  bool match = true;
+  for (int i = 0; i < 640 * 480 * 3; i++) {
+    if ((decompressed0[i] - decompressed1[i]) > ALLOWABLE_ERROR) {
+      match = false;
+    }
+  }
+  return match;
+}
+
 // NOLINTEND(misc-definitions-in-headers)
 #endif
