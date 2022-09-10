@@ -67,9 +67,11 @@ TEST_CASE("Benchmark Stream Processor") {
     JpegFile jpeg_frame = ReadJpeg(jpg_name);
     // NOLINTEND(readability-magic-numbers)
 
-    StreamProcessor processor = StreamProcessor(empty_output, configs.at(i).resolution.first, configs.at(i).resolution.second, CompFrameFormat::kRGB, 75, font_settings,
-                                                configs.at(i).motion, device_config);
-
+    StreamProcessor processor = StreamProcessor();
+    processor.SetRequired(configs.at(i).resolution.first, configs.at(i).resolution.second, CompFrameFormat::kRGB, 75);
+    processor.SetFont(font_settings);
+    processor.SetMotionSettings(configs.at(i).motion, device_config);
+    processor.SetOutput(empty_output);
     BENCHMARK(std::string(name)) { return ProcessFrame(processor, jpeg_frame); };
   }
 }

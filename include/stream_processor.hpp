@@ -23,26 +23,47 @@ class StreamProcessor {
  public:
   /**
    * StreamProcessor() - Constructor for stream processor
+   */
+  StreamProcessor() = default;
+
+  /**
+   * SetRequired() - Sets required settings (required)
    *
-   * output:            Output stream of info messages
    * width:             Width of stream
    * height:            Height of stream
    * frame_format:      Format for output (RGB or Grayscale)
    * quality:           Quality for output (JPEG compression quality)
-   * font_settings:     Setting for text overlay (optional)
-   * motion_fps_scale:  Denominator of multiple of fps to run motion detection at (i.e. motion_fps_scale = 2, fps = 30, motion_fps_ = 15) (optional)
-   * motion_config:     Motion detection configuration (optional)
-   * device_config:     Motion detection device configuration (optional)
    */
-  StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, FontSettings font_settings);
-  StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, MotionConfig motion_config,
-                  DeviceConfig device_config);
-  StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, MotionConfig motion_config,
-                  DeviceConfig device_config, unsigned int motion_fps_scale);
-  StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, FontSettings font_settings,
-                  MotionConfig motion_config, DeviceConfig device_config);
-  StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, FontSettings font_settings,
-                  MotionConfig motion_config, DeviceConfig device_config, unsigned int motion_fps_scale);
+  void SetRequired(unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality);
+
+  /**
+   * SetFont() - Sets font settings for overlay (optional)
+   *
+   * font_settings:     Setting for text overlay
+   */
+  void SetFont(FontSettings font_settings);
+
+  /**
+   * SetMotionFPSScale() - Sets rate scale for motion detection (optional)
+   *
+   * motion_fps_scale:  Denominator of multiple of fps to run motion detection at (i.e. motion_fps_scale = 2, fps = 30, motion_fps_ = 15)
+   */
+  void SetMotionFPSScale(unsigned int motion_fps_scale);
+
+  /**
+   * SetMotionSettings() - Sets settings for motion detection (optional)
+   *
+   * motion_config:     Motion detection configuration
+   * device_config:     Motion detection device configuration
+   */
+  void SetMotionSettings(MotionConfig motion_config, DeviceConfig device_config);
+
+  /**
+   * SetOutput() - Sets output for info messages (optional)
+   *
+   * output:    Output stream of info messages
+   */
+  void SetOutput(std::ostream* output);
 
   /**
    * ~StreamProcessor() - Deconstructor for Stream Processor
@@ -60,17 +81,6 @@ class StreamProcessor {
   Processed ProcessFrame(unsigned char* compressed_image, unsigned long& jpeg_size, long long timestamp = 0);
 
  private:
-  /**
-   * Init() - Sets up JPEG compressor and decompressor, sets vid_settings_, sets info_
-   *
-   * output:            Output stream of info messages
-   * width:             Width of stream
-   * height:            Height of stream
-   * frame_format:      Format for output (RGB or Grayscale)
-   * quality:           Quality for output (JPEG compression quality)
-   */
-  void Init(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality);
-
   bool text_;                    // Overlay text or not
   bool motion_;                  // Detect motion or not
   bool last_motion_ = false;     // If motion detected on last frame or not
@@ -84,7 +94,7 @@ class StreamProcessor {
   MotionDetector* motion_detector_ = nullptr;      // Motion detector
   TextOverlay* text_overlay_ = nullptr;            // Text overlayer
 
-  std::ostream* info_;  // Info output stream
+  std::ostream* info_ = new std::ostream(0);  // Info output stream
 };
 
 #endif

@@ -8,69 +8,33 @@
 #include "motion_detector.hpp"
 #include "text_overlay.hpp"
 
-StreamProcessor::StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, FontSettings font_settings) {
-  *output << "Creating stream processor with only text overlay" << std::endl;
-  Init(output, width, height, frame_format, quality);
+void StreamProcessor::SetRequired(unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality) {
+  // Convert CompFrameFormat to DecompFrameFormat
+  std::map<CompFrameFormat, DecompFrameFormat> decomp_format = {{CompFrameFormat::kGray, DecompFrameFormat::kGray}, {CompFrameFormat::kRGB, DecompFrameFormat::kRGB}};
+  vid_settings_ = {width, height, decomp_format.at(frame_format)};
 
+  // Setup compressors and decompressors
+  jpeg_compressor_ = new JpegCompressor(static_cast<int>(width), static_cast<int>(height), quality, frame_format, CompFrameMethod::kFast);
+  jpeg_decompressor_ = new JpegDecompressor(width, height, vid_settings_.frame_format, DecompFrameMethod::kFast);
+}
+
+void StreamProcessor::SetFont(FontSettings font_settings) {
   text_ = true;
-  motion_ = false;
-  // Setup text overlay
   text_overlay_ = new TextOverlay(vid_settings_, font_settings);  // NOLINT(performance-unnecessary-value-param)
 }
 
-StreamProcessor::StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, MotionConfig motion_config,
-                                 DeviceConfig device_config) {
-  *output << "Creating stream processor with only motion detection" << std::endl;
-  Init(output, width, height, frame_format, quality);
+void StreamProcessor::SetMotionFPSScale(unsigned int motion_fps_scale) { motion_fps_ = motion_fps_scale; }
 
-  text_ = false;
+void StreamProcessor::SetMotionSettings(MotionConfig motion_config, DeviceConfig device_config) {
   motion_ = true;
-  // Setup motion
   motion_detector_ = new MotionDetector(vid_settings_, motion_config, device_config, info_);
 }
 
-StreamProcessor::StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, MotionConfig motion_config,
-                                 DeviceConfig device_config, unsigned int motion_fps_scale) {
-  *output << "Creating stream processor with only motion detection set to detect on every " << motion_fps_scale << " frames" << std::endl;
-  Init(output, width, height, frame_format, quality);
-
-  text_ = false;
-  motion_ = true;
-  // Setup motion
-  motion_fps_ = motion_fps_scale;
-  motion_detector_ = new MotionDetector(vid_settings_, motion_config, device_config, info_);
-}
-
-StreamProcessor::StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, FontSettings font_settings,
-                                 MotionConfig motion_config, DeviceConfig device_config) {
-  *output << "Creating stream processor with text overlay and motion detection" << std::endl;
-  Init(output, width, height, frame_format, quality);
-
-  text_ = true;
-  motion_ = true;
-  // Setup text overlay
-  text_overlay_ = new TextOverlay(vid_settings_, font_settings);  // NOLINT(performance-unnecessary-value-param)
-  // Setup motion
-  motion_detector_ = new MotionDetector(vid_settings_, motion_config, device_config, info_);
-}
-
-StreamProcessor::StreamProcessor(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality, FontSettings font_settings,
-                                 MotionConfig motion_config, DeviceConfig device_config, unsigned int motion_fps_scale) {
-  *output << "Creating stream processor with text overlay and motion detection set to detect on every " << motion_fps_scale << " frames" << std::endl;
-  Init(output, width, height, frame_format, quality);
-
-  text_ = true;
-  motion_ = true;
-  // Setup text overlay
-  text_overlay_ = new TextOverlay(vid_settings_, font_settings);  // NOLINT(performance-unnecessary-value-param)
-  // Setup motion
-  motion_fps_ = motion_fps_scale;
-  motion_detector_ = new MotionDetector(vid_settings_, motion_config, device_config, info_);
-}
+void StreamProcessor::SetOutput(std::ostream* output) { info_ = output; }
 
 StreamProcessor::~StreamProcessor() {
-  if (motion_detector_ != nullptr) delete motion_detector_;
-  if (text_overlay_ != nullptr) delete text_overlay_;
+  delete motion_detector_;
+  delete text_overlay_;
   delete jpeg_compressor_;
   delete jpeg_decompressor_;
 }
@@ -94,16 +58,4 @@ Processed StreamProcessor::ProcessFrame(unsigned char* compressed_image, unsigne
   // Recompress image
   Compressed compressed = jpeg_compressor_->CompressImage(decompressed);
   return {compressed, last_motion_};
-}
-
-void StreamProcessor::Init(std::ostream* output, unsigned int width, unsigned int height, CompFrameFormat frame_format, int quality) {
-  info_ = output;
-
-  // Convert CompFrameFormat to DecompFrameFormat
-  std::map<CompFrameFormat, DecompFrameFormat> decomp_format = {{CompFrameFormat::kGray, DecompFrameFormat::kGray}, {CompFrameFormat::kRGB, DecompFrameFormat::kRGB}};
-  vid_settings_ = {width, height, decomp_format.at(frame_format)};
-
-  // Setup compressors and decompressors
-  jpeg_compressor_ = new JpegCompressor(static_cast<int>(width), static_cast<int>(height), quality, frame_format, CompFrameMethod::kFast);
-  jpeg_decompressor_ = new JpegDecompressor(width, height, vid_settings_.frame_format, DecompFrameMethod::kFast);
 }
