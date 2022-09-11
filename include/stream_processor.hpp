@@ -81,11 +81,11 @@ class StreamProcessor {
   Processed ProcessFrame(const unsigned char* compressed_image, unsigned long jpeg_size, long long timestamp = 0);
 
  private:
-  bool text_;                    // Overlay text or not
-  bool motion_;                  // Detect motion or not
-  bool last_motion_ = false;     // If motion detected on last frame or not
-  unsigned int motion_fps_ = 1;  // Multiple of fps to run motion detection at
-  unsigned int frame_count_;     // Frames processed (modulus (fps/motion_fps_))
+  bool text_ = false;             // Overlay text or not
+  bool motion_ = false;           // Detect motion or not
+  bool last_motion_ = false;      // If motion detected on last frame or not
+  unsigned int motion_fps_ = 1;   // Multiple of fps to run motion detection at
+  unsigned int frame_count_ = 0;  // Frames processed (modulus (fps/motion_fps_))
 
   InputVideoSettings vid_settings_;  // Video settings
 
