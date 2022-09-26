@@ -99,6 +99,5 @@ std::string TextOverlay::GenerateText(long long timestamp) const {
 
   std::stringstream time_string;
   time_string << std::put_time(std::localtime(&t_c), "%F %T %Z");
-  std::cout << time_string.str() << std::endl;
   return font_settings_.cam_name + " " + time_string.str();
 }
