@@ -2,10 +2,12 @@
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include <time.h>
+
 #include <chrono>
 #include <iomanip>
-#include <stdexcept>
 #include <iostream>
+#include <stdexcept>
 
 #include "motion_detector.hpp"
 
@@ -93,8 +95,10 @@ std::string TextOverlay::GenerateText(long long timestamp) const {
   auto epoch = std::chrono::time_point<std::chrono::system_clock>();
   auto old_now = epoch + std::chrono::duration_cast<std::chrono::seconds>(std::chrono::duration<int>(timestamp));
   auto t_c = std::chrono::system_clock::to_time_t(old_now);
+  std::time(&t_c);
 
   std::stringstream time_string;
   time_string << std::put_time(std::localtime(&t_c), "%F %T %Z");
+  std::cout << time_string.str() << std::endl;
   return font_settings_.cam_name + " " + time_string.str();
 }
