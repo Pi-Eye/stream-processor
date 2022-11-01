@@ -8,6 +8,7 @@ Pi-Eye's Processor For MJPEG Stream
 * C++
 * OpenCL
 * libjpeg-turbo
+* freetype
 
 ## Getting Started
 
@@ -23,12 +24,12 @@ Pi-Eye's Processor For MJPEG Stream
 
 1. Clone the repository
     ```sh
-    git clone https://github.com/Pi-Eye/mjpeg-motion-detector.git
+    git clone https://github.com/Pi-Eye/stream-processor.git
     ```
 
 2. Install dependencies
     ```sh
-    vcpkg install opencl libjpeg-turbo
+    vcpkg install opencl libjpeg-turbo freetype
     ```
 
     note. also install `catch2` if you would like to run tests and benchmarks
