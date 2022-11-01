@@ -1,9 +1,8 @@
-# MJPEG Motion Detector
+# Stream Processor
 
 ## About
 
-A simple motion detector for MJPEG streams.
-
+Pi-Eye's Processor For MJPEG Stream
 ### Built With
 
 * C++
@@ -69,43 +68,58 @@ A simple motion detector for MJPEG streams.
 #include <ostream>
 #include <vector>
 
-#include "motion_detector.hpp"
+#include "stream_processor.hpp"
 
 int main() {
+  StreamProcessor processor = StreamProcessor();
+
   unsigned int width = 1920;
-  unsigned int height = 1080;                                       // width and height of incoming jpeg frames (acceptable values: > 0)
-  DecompFrameFormat frame_format = DecompFrameFormat::kRGB;         // format to decompress frames into (acceptable values: kRGB, kGray)
+  unsigned int height = 1080;                                 // width and height of incoming jpeg frames (acceptable values: > 0)
+  CompFrameFormat comp_frame_format = CompFrameFormat::kRGB;  // format to decompress frames into (acceptable values: kRGB, kGray)
+  int quality = 75;                                           // Jpeg compression quality
 
-  unsigned int gaussian_radius = 2;                                 // radius of gaussian blur (0 means no blur) (acceptable values: > 0)
-  unsigned int scale = 2;                                           // amount to scale frame down by to save on computation (acceptable values: > 0)
-  unsigned int bg_stabilization_len = 10;                           // number of frames to average to form background frame (acceptable values: > 0)
-  unsigned int mvt_stabilization_len = 2;                           // number of frames to average to form movement frame (acceptable values: > 0)
-  unsigned int min_pixel_diff = 5;                                  // amount pixels need to be different by to be considered different (acceptable values: >= 0)
-  unsigned int min_changed_pixels = 0.2;                            // percentage of pixels that need to be different to be considered motion (acceptable values: 0.0 - 1.0)
-  DecompFrameMethod decomp_method = DecompFrameMethod::kAccurate;   // algorithm to use to decompress jpeg (acceptable values: kAccurate, kFast)
+  processor.SetRequired(width, height, comp_frame_format, quality);  // These setting are required to run
 
-  DeviceType device_type = DeviceType::kSpecific;                   // type of OpenCL device to select (acceptable values: kCPU, kGPU, kSpecific)
-  int device_choice = 0;                                            // index of OpenCL device to use (acceptable values: >=0)
+  std::string cam_name = "Camera Name";
+  TextPosition text_position = TextPosition::kTop;  // Where to place text overlay kTop or kBottom
+  bool show_date = true;                            // Currently not implemented
+  unsigned int font_size = 9;
+  std::string font_filename = "/path/to/font.tff";  // Path to font
+  FontSettings font_settings = {cam_name, text_position, show_date, font_size, font_filename};
 
-  InputVideoSettings input_video_settings = {width, height, frame_format};
+  processor.SetFont(font_settings);  // Set this to enable text overlay
+
+  unsigned int gaussian_radius = 2;                                // radius of gaussian blur (0 means no blur) (acceptable values: > 0)
+  unsigned int scale = 2;                                          // amount to scale frame down by to save on computation (acceptable values: > 0)
+  unsigned int bg_stabilization_len = 10;                          // number of frames to average to form background frame (acceptable values: > 0)
+  unsigned int mvt_stabilization_len = 2;                          // number of frames to average to form movement frame (acceptable values: > 0)
+  unsigned int min_pixel_diff = 5;                                 // amount pixels need to be different by to be considered different (acceptable values: >= 0)
+  float min_changed_pixels = 0.2;                                  // percentage of pixels that need to be different to be considered motion (acceptable values: 0.0 - 1.0)
+  DecompFrameMethod decomp_method = DecompFrameMethod::kAccurate;  // algorithm to use to decompress jpeg (acceptable values: kAccurate, kFast)
+
+  DeviceType device_type = DeviceType::kSpecific;  // type of OpenCL device to select (acceptable values: kCPU, kGPU, kSpecific)
+  int device_choice = 0;                           // index of OpenCL device to use (acceptable values: >=0)
+
   MotionConfig motion_config = {gaussian_radius, scale, bg_stabilization_len, mvt_stabilization_len, min_pixel_diff, min_changed_pixels};
   DeviceConfig device_config = {device_type, device_choice};
-  std::ostream* info_stream = &std::cout;                           // pipe info stream of motion detector to cout
+  std::ostream* info_stream = &std::cout;  // pipe info stream of motion detector to cout
 
-  MotionDetector motion = MotionDetector(input_video_settings, motion_config, device_config, info_stream);
+  processor.SetMotionSettings(motion_config, device_config);  // Set this to enable motion detection
 
-  std::vector<std::pair<unsigned char*, unsigned long>> frames;     // some group of jpeg frames to detect motion on 
-                                                                    // (unsigned char* - frame, unsigned long - size of jpeg frame buffer)
+  std::vector<std::pair<unsigned char*, unsigned long>> frames;  // some group of jpeg frames to detect motion on
+                                                                 // (unsigned char* - frame, unsigned long - size of jpeg frame buffer)
+  std::vector<long long> timestamps;                             // some group of frame timestamps (used to generate text overlay message)
 
   for (int i = 0; i < frames.size(); i++) {
-    bool has_motion = motion.DetectOnFrame(frames.at(i).first, frames.at(i).second);      // Detect if there is motion on given frame
+    Processed processed = processor.ProcessFrame(frames.at(i).first, frames.at(i).second, timestamps.at(i));  // Process given frame
 
-    if (has_motion) {
+    if (processed.motion) {
       std::cout << "Detected motion on frame number: " << i << std::endl;
     }
+    processed.compressed.frame;  // compressed jpeg frame
+    processed.compressed.size;   // compressed jpeg frame size
   }
 }
-
 ```
 
 

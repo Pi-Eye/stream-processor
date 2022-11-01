@@ -1,8 +1,6 @@
 #include <iostream>
 
-#include "stream_processor.hpp"
 #include "motion_detector.hpp"
-#include "text_overlay.hpp"
 
 int main() {
   try {
